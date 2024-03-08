@@ -1,0 +1,19 @@
+org:
+    makkiato:
+        arcadedb:
+            connection:
+                host: localhost
+                port: 2480
+                database: testdb
+                username: root
+                password: playwithdata
+                leader-preferred: true
+
+logging:
+  level:
+    root: TRACE
+
+spring:
+    threads:
+        virtual:
+            enabled: true

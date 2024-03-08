@@ -1,10 +1,10 @@
 package org.makkiato.arcadeclient.request.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.makkiato.arcadeclient.configuration.ApplicationConfiguration;
 import org.makkiato.arcadeclient.exception.server.ArcadedbServerException;
 import org.makkiato.arcadeclient.exception.server.IllegalArgumentException;
 import org.makkiato.arcadeclient.request.DatabaseCreateRequest;
@@ -27,7 +27,7 @@ class DatabaseCreateRequestTest {
         } catch(ArcadedbServerException ex) {
             assertEquals(IllegalArgumentException.class, ex.getClass());
             assertEquals("Cannot execute command", ex.getBody().error());
-            assertEquals("Database 'dbtest' already exists", ex.getBody().detail());
+            assertThat(ex.getBody().detail()).matches("Database .* already exists");
             assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
         }
     }

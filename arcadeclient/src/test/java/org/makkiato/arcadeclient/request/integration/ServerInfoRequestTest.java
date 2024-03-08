@@ -3,7 +3,6 @@ package org.makkiato.arcadeclient.request.integration;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.makkiato.arcadeclient.configuration.ApplicationConfiguration;
 import org.makkiato.arcadeclient.request.ServerInfoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;

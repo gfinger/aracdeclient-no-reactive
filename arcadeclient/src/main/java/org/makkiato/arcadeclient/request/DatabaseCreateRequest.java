@@ -1,9 +1,9 @@
 package org.makkiato.arcadeclient.request;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import org.makkiato.arcadeclient.response.StatusResponseBody;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
 public class DatabaseCreateRequest implements Function<String, Boolean> {
@@ -15,7 +15,7 @@ public class DatabaseCreateRequest implements Function<String, Boolean> {
 
     @Override
     public Boolean apply(String dbname) {
-        var payload = new CommandPayload("sql", "create database " + dbname, null, "json");
+        var payload = new CommandPayload("create database :dbname", Map.of("dbname", dbname));
         var status = client.post()
                 .uri("/server")
                 .body(payload)
