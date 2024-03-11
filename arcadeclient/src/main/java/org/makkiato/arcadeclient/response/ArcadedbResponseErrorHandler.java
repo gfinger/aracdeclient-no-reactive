@@ -2,11 +2,8 @@ package org.makkiato.arcadeclient.response;
 
 import java.io.IOException;
 
-import org.makkiato.arcadeclient.exception.server.BadRequestException;
-import org.makkiato.arcadeclient.exception.server.IllegalArgumentException;
-import org.makkiato.arcadeclient.exception.server.NotFoundException;
-import org.makkiato.arcadeclient.exception.server.RemoteException;
-import org.makkiato.arcadeclient.exception.server.SecurityException;
+import org.makkiato.arcadeclient.exception.server.ClientError;
+import org.makkiato.arcadeclient.exception.server.ServerError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.NonNull;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 @Component
 public class ArcadedbResponseErrorHandler implements ResponseErrorHandler {
@@ -30,22 +28,17 @@ public class ArcadedbResponseErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(@NonNull ClientHttpResponse response) throws IOException {
-        if(response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-            throw new NotFoundException(new ErrorResponseBody(null, null, null, null), HttpStatus.NOT_FOUND);
+        try {
+            ErrorResponseBody error = mapper.readValue(response.getBody(), ErrorResponseBody.class);
+            var statusCode = response.getStatusCode();
+            if (statusCode.is4xxClientError()) {
+                throw new ClientError(error == null ? new ErrorResponseBody() : error, response.getStatusCode());
+            } else {
+                throw new ServerError(error == null ? new ErrorResponseBody() : error, response.getStatusCode());
+            }
+        } catch (MismatchedInputException ex) {
+            throw new ClientError(new ErrorResponseBody(), response.getStatusCode());
         }
-
-        ErrorResponseBody error = mapper.readValue(response.getBody(), ErrorResponseBody.class);
-        if(error == null || error.exception() == null) {
-            throw new BadRequestException(new ErrorResponseBody(null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-
-        throw switch (error.exception()) {
-            case "com.arcadedb.server.security.ServerSecurityException" ->
-                new SecurityException(error, response.getStatusCode());
-            case "java.lang.IllegalArgumentException" ->
-                new IllegalArgumentException(error, response.getStatusCode());
-            default -> new RemoteException(error, response.getStatusCode());
-        };
     }
 
 }

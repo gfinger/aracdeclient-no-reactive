@@ -1,7 +1,7 @@
 package org.makkiato.arcadeclient.request;
 
-import java.util.function.BiFunction;
-
+import org.makkiato.arcadeclient.response.SqlCommandResponseBody;
+import org.springframework.lang.NonNull;
 import org.springframework.web.client.RestClient;
 
 public class SqlCommandRequest {
@@ -15,12 +15,12 @@ public class SqlCommandRequest {
         return new SqlCommandRequest(client);
     }
 
-    public <T> T apply(CommandPayload payload, Class<T> clazz) {
+    public SqlCommandResponseBody apply(@NonNull CommandPayload payload, @NonNull String dbname) {
         return client.post()
-                .uri("/server")
+                .uri(String.format("/command/%s", dbname))
                 .body(payload)
                 .retrieve()
-                .body(clazz);
+                .body(SqlCommandResponseBody.class);
     }
 
 }

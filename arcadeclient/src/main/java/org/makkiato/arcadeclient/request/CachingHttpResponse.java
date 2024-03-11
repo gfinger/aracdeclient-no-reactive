@@ -40,6 +40,6 @@ public class CachingHttpResponse implements ClientHttpResponse {
 
     @Override
     public void close() {
-        delegate.close();
+        buffer = null;
     }
 }

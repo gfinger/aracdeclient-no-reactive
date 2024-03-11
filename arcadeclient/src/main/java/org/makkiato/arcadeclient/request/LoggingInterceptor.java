@@ -23,7 +23,7 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
             var response = execution.execute(request, body);
             if (log.isDebugEnabled()) {
                 var cachedResponse = new CachingHttpResponse(response);
-                log(response);
+                log(cachedResponse);
                 response = cachedResponse;
             }
             return response;
@@ -44,7 +44,8 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
         response.getHeaders().forEach((header, values) -> builder.append(String.format("%s: %s\n", header, values)));
         try (var body = response.getBody()) {
             if (body != null) {
-                builder.append(StreamUtils.copyToString(body, StandardCharsets.UTF_8));
+                var bodyS = StreamUtils.copyToString(body, StandardCharsets.UTF_8);
+                builder.append(bodyS);
             }
         } catch (IOException ex) {
             log.error("Exception thrown by HttpRequest:", ex);

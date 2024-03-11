@@ -1,6 +1,5 @@
 package org.makkiato.arcadeclient.request;
 
-import java.util.Map;
 import java.util.function.Function;
 
 import org.makkiato.arcadeclient.response.StatusResponseBody;
@@ -15,13 +14,13 @@ public class DatabaseCreateRequest implements Function<String, Boolean> {
 
     @Override
     public Boolean apply(String dbname) {
-        var payload = new CommandPayload("create database :dbname", Map.of("dbname", dbname));
+        var payload = new CommandPayload(String.format("create database %s", dbname));
         var status = client.post()
                 .uri("/server")
                 .body(payload)
                 .retrieve()
                 .body(StatusResponseBody.class);
-        return status.result().equals("ok");
+        return status != null && status.result() != null && status.result().equals("ok");
     }
 
 }

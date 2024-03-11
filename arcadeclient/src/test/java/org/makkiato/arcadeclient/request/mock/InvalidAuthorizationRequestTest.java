@@ -1,11 +1,14 @@
 package org.makkiato.arcadeclient.request.mock;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 import org.junit.jupiter.api.Test;
-import org.makkiato.arcadeclient.exception.server.ArcadedbServerException;
+import org.makkiato.arcadeclient.exception.server.ArcadeClientException;
+import org.makkiato.arcadeclient.exception.server.ClientError;
+import org.makkiato.arcadeclient.exception.server.ServerError;
 import org.makkiato.arcadeclient.request.ServerInfoRequest;
 import org.makkiato.arcadeclient.response.ErrorResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +43,8 @@ public class InvalidAuthorizationRequestTest {
         var request = new ServerInfoRequest(client);
         try {
             request.get();
-        } catch (ArcadedbServerException ex) {
-            assertEquals(org.makkiato.arcadeclient.exception.server.SecurityException.class, ex.getClass());
+        } catch (Exception ex) {
+            assertThat(ex).isInstanceOf(ClientError.class);
 
         }
     }
