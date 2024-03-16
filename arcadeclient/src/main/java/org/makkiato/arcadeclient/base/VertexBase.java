@@ -2,15 +2,13 @@ package org.makkiato.arcadeclient.base;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
-@RequiredArgsConstructor
-public class VertexBase {
-    private final String type;
-    private final String cat;
-    private final String rid;
+public class VertexBase extends DocumentBase {
+    public VertexBase(String type, String cat, String rid) {
+        super(type, cat, rid);
+    }
 }

@@ -1,8 +1,12 @@
-package org.makkiato.arcadeclient.base.exampleapp;
+package org.makkiato.arcadeclient.request.model;
 
 import java.time.LocalDate;
 
 import org.makkiato.arcadeclient.base.VertexBase;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,10 +20,16 @@ public class Person extends VertexBase {
         super(type, cat, rid);
         this.name = name;
         this.dateOfDeath = dateOfDeath;
-        this.dateOfBirth = null;
+        this.dateOfBirth = dateOfBirth;
     }
-    
+
     private final String name;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MM yyyy GG")
+    @JsonDeserialize(using = DateDeserializer.class)
     private final LocalDate dateOfBirth;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MM yyyy GG")
+    @JsonDeserialize(using = DateDeserializer.class)
     private final LocalDate dateOfDeath;
 }

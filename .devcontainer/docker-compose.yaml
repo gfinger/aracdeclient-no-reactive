@@ -11,4 +11,5 @@ services:
   db:
     image: gfinger/arcadedb:23.6.1
     restart: unless-stopped
+
     

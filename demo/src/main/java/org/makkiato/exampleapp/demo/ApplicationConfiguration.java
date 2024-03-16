@@ -1,8 +1,7 @@
-package org.makkiato.arcadeclient.configuration;
+package org.makkiato.exampleapp.demo;
 
 import java.util.Base64;
 
-import org.apache.coyote.http11.Http11InputBuffer;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;

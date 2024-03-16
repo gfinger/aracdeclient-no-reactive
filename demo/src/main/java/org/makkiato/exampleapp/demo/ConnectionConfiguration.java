@@ -1,4 +1,4 @@
-package org.makkiato.arcadeclient.configuration;
+package org.makkiato.exampleapp.demo;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;

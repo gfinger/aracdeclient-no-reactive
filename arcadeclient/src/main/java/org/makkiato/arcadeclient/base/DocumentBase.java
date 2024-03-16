@@ -1,16 +1,20 @@
 package org.makkiato.arcadeclient.base;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
-@RequiredArgsConstructor
-public class DocumentBase {
-    private final String type;
-    private final String cat;
+public class DocumentBase extends EmbeddedDocumentBase {
+    public DocumentBase(String type, String cat, String rid) {
+        super(type, cat);
+        this.rid = rid;
+    }
+
+    @JsonProperty(value = "@rid", access = JsonProperty.Access.WRITE_ONLY)
     private final String rid;
 }

@@ -1,20 +1,27 @@
 package org.makkiato.arcadeclient.request;
 
-import java.util.function.Function;
-
 import org.makkiato.arcadeclient.response.StatusResponseBody;
 import org.springframework.web.client.RestClient;
 
-public class DatabaseCreateRequest implements Function<String, Boolean> {
+public class DatabaseManagementRequests {
     RestClient client;
 
-    public DatabaseCreateRequest(RestClient client) {
+    public DatabaseManagementRequests(RestClient client) {
         this.client = client;
     }
 
-    @Override
-    public Boolean apply(String dbname) {
+    public Boolean createDatabase(String dbname) {
         var payload = new CommandPayload(String.format("create database %s", dbname));
+        var status = client.post()
+                .uri("/server")
+                .body(payload)
+                .retrieve()
+                .body(StatusResponseBody.class);
+        return status != null && status.result() != null && status.result().equals("ok");
+    }
+
+    public Boolean dropDatabase(String dbname) {
+        var payload = new CommandPayload(String.format("drop database %s", dbname));
         var status = client.post()
                 .uri("/server")
                 .body(payload)

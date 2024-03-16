@@ -1,0 +1,118 @@
+POST http://{{host}}:{{port}}/{{api}}/server
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+   "command": "create database {{db}}" 
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 18
+date: Fri, 15 Mar 2024 16:41:53 GMT
+###
+POST http://{{host}}:{{port}}/{{api}}/command/{{db}}
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+    "language": "sqlscript",
+    "command": "alter database dateformat \"dd MM yyyy GG\";\
+                alter database datetimeformat \"dd MM yyyy GG HH:mm:ss\";\
+                create vertex type Person if not exists;\
+                create property Person.name if not exists String (mandatory true, notnull true);\
+                create index if not exists on Person (name) unique;\
+                create property Person.dateOfBirth if not exists Date;\
+                create property Person.dateOfDeath if not exists Date;\
+                create vertex type Event if not exists;\
+                create property Event.title if not exists String (mandatory true, notnull true);\
+                create index if not exists on Event (title) notunique;\
+                create property Event.date if not exists Date;\
+                create property Event.description if not exists Embedded;\
+                create edge type IsInvolved if not exists;\
+                create property IsInvolved.`@out` if not exists link of Person;\
+                create property IsInvolved.`@in` if not exists link of Event"
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 142
+date: Fri, 15 Mar 2024 16:41:55 GMT
+###
+POST http://{{host}}:{{port}}/{{api}}/command/{{db}}
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+    "language": "sqlscript",
+    "command": "create vertex Person set name = 'Hannibal';\
+                create vertex Event set title = 'Battle of Trebia';\
+                create edge IsInvolved from (select from Person where name = 'Hannibal') to (select from Event where title = 'Battle of Trebia')"
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 218
+date: Fri, 15 Mar 2024 16:41:59 GMT
+###
+POST http://{{host}}:{{port}}/{{api}}/command/{{db}}
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+    "language": "sql",
+    "command": "select from Person"
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 203
+date: Fri, 15 Mar 2024 16:43:36 GMT
+###
+POST http://{{host}}:{{port}}/{{api}}/command/{{db}}
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+    "language": "sql",
+    "command": "select out('IsInvolved') from Person where name = 'Hannibal'"
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 246
+date: Fri, 15 Mar 2024 16:49:43 GMT
+###
+POST http://{{host}}:{{port}}/{{api}}/command/{{db}}
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+    "language": "sql",
+    "command": "select from Event"
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 212
+date: Fri, 15 Mar 2024 16:44:49 GMT
+###
+POST http://{{host}}:{{port}}/{{api}}/server
+Authorization: Basic {{user}} {{password}}
+Content-Type: application/json
+
+{
+   "command": "drop database {{db}}" 
+}
+
+HTTP/1.1 200  - OK
+connection: close
+content-type: application/json
+content-length: 18
+date: Sat, 16 Mar 2024 15:31:57 GMT

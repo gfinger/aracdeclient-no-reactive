@@ -1,9 +1,12 @@
 package org.makkiato.arcadeclient.request.integration;
 
+import java.time.LocalDate;
 import java.util.Base64;
 
-import org.apache.coyote.http11.Http11InputBuffer;
+import org.makkiato.arcadeclient.base.ArcadeClient;
+import org.makkiato.arcadeclient.request.ArcadeTemplate;
 import org.makkiato.arcadeclient.request.LoggingInterceptor;
+import org.makkiato.arcadeclient.request.utils.CustomDateDeserializer;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -14,6 +17,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
@@ -47,5 +54,22 @@ public class ApplicationConfiguration {
                 return "Basic " + Base64
                                 .getEncoder()
                                 .encodeToString((username + ":" + password).getBytes());
+        }
+
+        @Bean
+        ArcadeClient arcadeClient(RestClient restClient, ObjectMapper mapper) {
+                return new ArcadeClient(restClient, "dbtest", mapper);
+        }
+
+        @Bean
+        ArcadeTemplate arcadeTemplate(ArcadeClient arcadeClient) {
+                return new ArcadeTemplate(arcadeClient);
+        }
+
+        @Bean
+        Module dateDeserializer() {
+                var module = new SimpleModule();
+                module.addDeserializer(LocalDate.class, new CustomDateDeserializer());
+                return module;
         }
 }
