@@ -6,6 +6,7 @@ import org.makkiato.arcadeclient.base.VertexBase;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
 
 import lombok.EqualsAndHashCode;
@@ -25,11 +26,7 @@ public class Person extends VertexBase {
 
     private final String name;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MM yyyy GG")
-    @JsonDeserialize(using = DateDeserializer.class)
     private final LocalDate dateOfBirth;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MM yyyy GG")
-    @JsonDeserialize(using = DateDeserializer.class)
     private final LocalDate dateOfDeath;
 }

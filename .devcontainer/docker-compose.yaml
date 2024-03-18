@@ -9,7 +9,7 @@ services:
     command: sleep infinity
 
   db:
-    image: gfinger/arcadedb:23.6.1
+    image: gfinger/arcadedb-local:24.2.1
     restart: unless-stopped
 
     

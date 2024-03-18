@@ -7,6 +7,7 @@ import org.makkiato.arcadeclient.base.ArcadeClient;
 import org.makkiato.arcadeclient.request.ArcadeTemplate;
 import org.makkiato.arcadeclient.request.LoggingInterceptor;
 import org.makkiato.arcadeclient.request.utils.CustomDateDeserializer;
+import org.makkiato.arcadeclient.request.utils.CustomDateSerializer;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -70,6 +71,7 @@ public class ApplicationConfiguration {
         Module dateDeserializer() {
                 var module = new SimpleModule();
                 module.addDeserializer(LocalDate.class, new CustomDateDeserializer());
+                module.addSerializer(LocalDate.class, new CustomDateSerializer());
                 return module;
         }
 }

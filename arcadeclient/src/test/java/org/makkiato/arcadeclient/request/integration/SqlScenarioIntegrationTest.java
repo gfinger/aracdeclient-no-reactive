@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import static org.makkiato.arcadeclient.query.Condition.And;
+import static org.makkiato.arcadeclient.query.Condition.Equals;
+import static org.makkiato.arcadeclient.query.Select.SelectFrom;
 
 @SpringJUnitConfig(ApplicationConfiguration.class)
 @TestMethodOrder(OrderAnnotation.class)
@@ -80,6 +84,26 @@ public class SqlScenarioIntegrationTest {
 
     @Test
     @Order(3)
+    void executeAlterDatabaseScript() {
+        var script = new String[] {
+                "alter database `arcadedb.dateImplementation` `java.time.LocalDate`",
+                "alter database `arcadedb.dateTimeImplementation` `java.time.LocalDateTime`",
+                "alter database dateformat \"dd MM yyyy GG\"",
+                "alter database datetimeformat \"dd MM yyyy GG HH:mm:ss\""
+        };
+        try {
+            var response = SqlCommandRequest.withClient(client).apply(
+                    new CommandPayload("sqlscript", script, Collections.EMPTY_MAP), dbname);
+            assertThat(response).isNotNull();
+        } catch (Exception ex) {
+            assertThat(ex).isInstanceOf(ServerError.class);
+            var serverException = (ServerError) ex;
+            assertThat(serverException.getBody().exceptionArgs()).isNotBlank();
+        }
+    }
+
+    @Test
+    @Order(4)
     void createDocumentIfNotExists() {
         var response = SqlCommandRequest.withClient(client).apply(
                 new CommandPayload("create document type Description if not exists"),
@@ -90,25 +114,22 @@ public class SqlScenarioIntegrationTest {
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     void executeSqlscript() {
         var script = new String[] {
-                "alter database dateformat \"dd MM yyyy GG\"",
-                "alter database datetimeformat \"dd MM yyyy GG HH:mm:ss\"",
                 "create vertex type Person if not exists",
                 "create property Person.name if not exists String (mandatory true, notnull true)",
                 "create index if not exists on Person (name) unique",
-                "create property Person.dateOfBirth if not exists Date",
-                "create property Person.dateOfDeath if not exists Date",
+                "create property Person.dateOfBirth if not exists Long",
+                "create property Person.dateOfDeath if not exists Long",
                 "create vertex type Event if not exists",
                 "create property Event.title if not exists String (mandatory true, notnull true)",
                 "create index if not exists on Event (title) notunique",
-                "create property Event.date if not exists Date",
+                "create property Event.date if not exists Long",
                 "create property Event.description if not exists Embedded",
                 "create edge type IsInvolved if not exists",
                 "create property IsInvolved.`@out` if not exists link of Person",
-                "create property IsInvolved.`@in` if not exists link of Event",
-                "insert into Person set name = :name"
+                "create property IsInvolved.`@in` if not exists link of Event"
         };
         try {
             var response = SqlCommandRequest.withClient(client).apply(
@@ -129,12 +150,12 @@ public class SqlScenarioIntegrationTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     void insertVertex() throws JsonMappingException, JsonProcessingException {
         var dateFormatter = DateTimeFormatter.ofPattern("dd MM yyyy GG");
         var dateOfDeath = LocalDate.parse("01 01 0001 AD", dateFormatter);
         var dateOfBirth = LocalDate.parse("01 01 0001 BC", dateFormatter);
-        var person = arcadeTemplate.insertVertex(
+        var person = arcadeTemplate.insertDocument(
                 new Person(null, null, null, "Chlodwig", dateOfBirth, dateOfDeath));
         assertThat(person).isNotNull();
         assertThat(person.getRid()).isNotBlank();
@@ -146,13 +167,13 @@ public class SqlScenarioIntegrationTest {
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     void insertVertexWithEmbeddedDocument() throws JsonMappingException, JsonProcessingException {
         var dateFormatter = DateTimeFormatter.ofPattern("dd MM yyyy GG");
         var eventDate = LocalDate.parse("01 01 0001 AD", dateFormatter);
         var description = new Description(null, null, "Was this the day when Jesus was born?");
         var event = arcadeTemplate
-                .insertVertex(new Event("Event", null, null, eventDate, "Birth of Jesus", description));
+                .insertDocument(new Event("Event", null, null, eventDate, "Birth of Jesus", description));
         assertThat(event).isNotNull();
         assertThat(event.getRid()).isNotBlank();
         assertThat(event.getCat()).isNotBlank();
@@ -165,7 +186,19 @@ public class SqlScenarioIntegrationTest {
     }
 
     @Test
-    @Order(6)
+    @Order(8)
+    void select() throws JsonProcessingException, IllegalArgumentException {
+        var dateFormatter = DateTimeFormatter.ofPattern("dd MM yyyy GG");
+        var dateOfDeath = LocalDate.parse("01 01 0001 AD", dateFormatter);  
+        var dateOfBirth = LocalDate.parse("01 01 0001 BC", dateFormatter);  
+        var selected = arcadeTemplate.selectDocument(SelectFrom("Person").Where(Equals("dateOfBirth", dateOfBirth)), Person.class);
+        assertThat(selected).isNotEmpty();
+        assertThat(selected.get(0).getDateOfBirth()).isEqualTo(dateOfBirth);
+        assertThat(selected.get(0).getDateOfDeath()).isEqualTo(dateOfDeath);
+    }
+
+    @Test
+    @Order(9)
     void createEdge() {
 
     }
